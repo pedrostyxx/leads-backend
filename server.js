@@ -1,9 +1,11 @@
+require('dotenv').config(); // Adicionado para carregar variáveis de ambiente
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Parser } = require('json2csv');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios'); // Adicionado para realizar requisições HTTP
 
 const app = express();
 const PORT = 80;
@@ -29,6 +31,32 @@ const saveLeads = (leads) => {
   fs.writeFileSync(DATA_FILE, JSON.stringify(leads, null, 2));
 };
 
+// Função para enviar mensagem via API Evolution
+const sendWhatsAppMessage = async (formData) => {
+  const apiUrl = 'https://evolutionapi.styxx.cloud';
+  const instanceName = 'autosg';
+  const phoneNumber = '5511930651948';
+  const apiKey = process.env.EVOLUTION_API_KEY; // Obtém a API key do .env
+  const message = `Novo formulário recebido:\nNome: ${formData.name}\nEmail: ${formData.email}\nWhatsApp: ${formData.whatsapp || 'N/A'}\nNome do Aluno: ${formData.studentName || 'N/A'}\nIdade do Aluno: ${formData.studentAge || 'N/A'}`;
+
+  try {
+    await axios.post(`${apiUrl}/message/sendText/${instanceName}`, {
+      number: phoneNumber,
+      textMessage: {
+        text: message,
+      },
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apiKey,
+      },
+    });
+    console.log('Mensagem enviada com sucesso para o WhatsApp.');
+  } catch (error) {
+    console.error('Erro ao enviar mensagem para o WhatsApp:', error.response?.data || error.message);
+  }
+};
+
 // Carrega os dados ao iniciar o servidor
 let leads = loadLeads();
 
@@ -44,6 +72,9 @@ app.post('/submit', (req, res) => {
   leads.push(formData);
   saveLeads(leads); // Salva os dados no arquivo
   console.log('Dados recebidos:', formData);
+
+  // Envia mensagem via API Evolution
+  sendWhatsAppMessage(formData);
 
   res.status(200).json({ message: 'Dados recebidos com sucesso!' });
 });
