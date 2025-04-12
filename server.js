@@ -42,6 +42,11 @@ const sendWhatsAppMessage = async (formData) => {
   try {
     await axios.post(`${apiUrl}/message/sendText/${instanceName}`, {
       number: phoneNumber,
+      options: {
+        delay: 0,
+        presence: "composing",
+        linkPreview: false,
+      },
       textMessage: {
         text: message,
       },
