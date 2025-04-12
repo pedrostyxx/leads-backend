@@ -59,9 +59,11 @@ const sendWhatsAppMessage = async (formData) => {
   };
 
   try {
-    const response = await fetch(`${apiUrl}/message/sendText/autosg`, options);
+    const response = await fetch(`${apiUrl}/message/sendText/${instanceName}`, options);
     const result = await response.json();
-    console.log('Resposta da API Evolution:', result);
+
+    // Formata a resposta para exibição legível
+    console.log('Resposta da API Evolution:', JSON.stringify(result, null, 2));
   } catch (err) {
     console.error('Erro ao enviar mensagem para o WhatsApp:', err);
   }
