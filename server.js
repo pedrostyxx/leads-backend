@@ -5,7 +5,7 @@ const cors = require('cors');
 const { Parser } = require('json2csv');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios'); // Adicionado para realizar requisições HTTP
+const fetch = require('node-fetch'); // Adicionado para realizar requisições HTTP com fetch
 
 const app = express();
 const PORT = 80;
@@ -39,26 +39,31 @@ const sendWhatsAppMessage = async (formData) => {
   const apiKey = process.env.EVOLUTION_API_KEY; // Obtém a API key do .env
   const message = `Novo formulário recebido:\nNome: ${formData.name}\nEmail: ${formData.email}\nWhatsApp: ${formData.whatsapp || 'N/A'}\nNome do Aluno: ${formData.studentName || 'N/A'}\nIdade do Aluno: ${formData.studentAge || 'N/A'}`;
 
-  try {
-    await axios.post(`${apiUrl}/message/sendText/${instanceName}`, {
+  const options = {
+    method: 'POST',
+    headers: {
+      apikey: apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
       number: phoneNumber,
       options: {
         delay: 0,
-        presence: "composing",
+        presence: 'composing',
         linkPreview: false,
       },
       textMessage: {
         text: message,
       },
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': apiKey,
-      },
-    });
-    console.log('Mensagem enviada com sucesso para o WhatsApp.');
-  } catch (error) {
-    console.error('Erro ao enviar mensagem para o WhatsApp:', error.response?.data || error.message);
+    }),
+  };
+
+  try {
+    const response = await fetch(`${apiUrl}/message/sendText/${instanceName}`, options);
+    const result = await response.json();
+    console.log('Resposta da API Evolution:', result);
+  } catch (err) {
+    console.error('Erro ao enviar mensagem para o WhatsApp:', err);
   }
 };
 
