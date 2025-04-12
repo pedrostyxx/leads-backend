@@ -5,7 +5,6 @@ const cors = require('cors');
 const { Parser } = require('json2csv');
 const fs = require('fs');
 const path = require('path');
-const fetch = require('node-fetch'); // Adicionado para realizar requisições HTTP com fetch
 
 const app = express();
 const PORT = 80;
@@ -33,6 +32,7 @@ const saveLeads = (leads) => {
 
 // Função para enviar mensagem via API Evolution
 const sendWhatsAppMessage = async (formData) => {
+  const fetch = (await import('node-fetch')).default; // Importação dinâmica
   const apiUrl = 'https://evolutionapi.styxx.cloud';
   const instanceName = 'autosg';
   const phoneNumber = '5511930651948';
