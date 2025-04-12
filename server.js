@@ -59,7 +59,7 @@ const sendWhatsAppMessage = async (formData) => {
   };
 
   try {
-    const response = await fetch(`${apiUrl}/message/sendText/${instanceName}`, options);
+    const response = await fetch(`${apiUrl}/message/sendText/autosg`, options);
     const result = await response.json();
     console.log('Resposta da API Evolution:', result);
   } catch (err) {
