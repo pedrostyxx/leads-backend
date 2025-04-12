@@ -35,28 +35,32 @@ const sendWhatsAppMessage = async (formData) => {
   const fetch = (await import('node-fetch')).default; // Importação dinâmica
   const apiUrl = 'https://evolutionapi.styxx.cloud';
   const instanceName = 'autosg';
-  const phoneNumber = '5511930651948';
   const apiKey = process.env.EVOLUTION_API_KEY; // Obtém a API key do .env
   const message = `Novo formulário recebido:\nNome: ${formData.name}\nEmail: ${formData.email}\nWhatsApp: ${formData.whatsapp || 'N/A'}\nNome do Aluno: ${formData.studentName || 'N/A'}\nIdade do Aluno: ${formData.studentAge || 'N/A'}`;
 
-  const options = {
-    method: 'POST',
-    headers: {
-      apikey: apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      number: phoneNumber,
-      text: message,
-    }),
-  };
+  // Lista de números para enviar a mensagem
+  const phoneNumbers = ['5511930651948', '5516991002036', '16992578710']; // Adicione mais números conforme necessário
 
-  try {
-    const response = await fetch(`${apiUrl}/message/sendText/${instanceName}`, options);
-    const result = await response.json();
-    console.log('Resposta da API Evolution:', JSON.stringify(result, null, 2));
-  } catch (err) {
-    console.error('Erro ao enviar mensagem para o WhatsApp:', err);
+  for (const phoneNumber of phoneNumbers) {
+    const options = {
+      method: 'POST',
+      headers: {
+        apikey: apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        number: phoneNumber,
+        text: message,
+      }),
+    };
+
+    try {
+      const response = await fetch(`${apiUrl}/message/sendText/${instanceName}`, options);
+      const result = await response.json();
+      console.log(`Resposta da API Evolution para ${phoneNumber}:`, JSON.stringify(result, null, 2));
+    } catch (err) {
+      console.error(`Erro ao enviar mensagem para o número ${phoneNumber}:`, err);
+    }
   }
 };
 
